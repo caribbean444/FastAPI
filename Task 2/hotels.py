@@ -1,6 +1,7 @@
 from fastapi import Body, APIRouter, Query
 from pydantic import BaseModel, Field
 
+from dependencies import PaginationDep
 from schemas.hotels import Hotel, HotelPatch
 
 
@@ -20,10 +21,9 @@ hotels = [
 
 @router.get("")
 async def get_hotels(
+    pagination: PaginationDep,
     id: int | None = Query(None, description="Id"),
     title: str | None = Query(None, description="Название отеля"),
-    page: int | None = Query(1, gt=1, description="Номер страницы"),
-    per_page: int | None = Query(3, gt=1, lt=30, description="Количество отелей на странице")
 ):
     hotels_ = []
     for hotel in hotels:
@@ -32,10 +32,9 @@ async def get_hotels(
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
-    print(page, per_page)
-    if page > 0 and per_page > 0 : # type: ignore
-        start = (page - 1) * per_page # type: ignore
-        end = start + per_page # type: ignore
+    if pagination.page > 0 and pagination.per_page > 0 : # type: ignore
+        start = (pagination.page - 1) * pagination.per_page # type: ignore
+        end = start + pagination.per_page # type: ignore
         return hotels_[start:end]
     else:
         return {"status": "Invalid page or per_page"}
