@@ -22,8 +22,8 @@ hotels = [
 async def get_hotels(
     id: int | None = Query(None, description="Id"),
     title: str | None = Query(None, description="Название отеля"),
-    page: int | None = Query(1, description="Номер страницы"),
-    per_page: int | None = Query(3, description="Количество отелей на странице")
+    page: int | None = Query(1, gt=1, description="Номер страницы"),
+    per_page: int | None = Query(3, gt=1, lt=30, description="Количество отелей на странице")
 ):
     hotels_ = []
     for hotel in hotels:
