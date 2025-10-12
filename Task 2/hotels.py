@@ -9,6 +9,11 @@ router = APIRouter(prefix="/hotels")
 hotels = [
     {"id": 1, "title": "Sochi", "name": "sochi"},
     {"id": 2, "title": "Дубай", "name": "dubai"},
+    {"id": 3, "title": "Мальдивы", "name": "maldivi"},
+    {"id": 4, "title": "Геленджик", "name": "gelendzhik"},
+    {"id": 5, "title": "Москва", "name": "moscow"},
+    {"id": 6, "title": "Казань", "name": "kazan"},
+    {"id": 7, "title": "Санкт-Петербург", "name": "spb"},
 ]
 
 
@@ -17,6 +22,8 @@ hotels = [
 async def get_hotels(
     id: int | None = Query(None, description="Id"),
     title: str | None = Query(None, description="Название отеля"),
+    page: int | None = Query(1, description="Номер страницы"),
+    per_page: int | None = Query(3, description="Количество отелей на странице")
 ):
     hotels_ = []
     for hotel in hotels:
@@ -25,7 +32,13 @@ async def get_hotels(
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
-
+    print(page, per_page)
+    if page > 0 and per_page > 0 : # type: ignore
+        start = (page - 1) * per_page # type: ignore
+        end = start + per_page # type: ignore
+        return hotels_[start:end]
+    else:
+        return {"status": "Invalid page or per_page"}
     return hotels_
 
 
