@@ -72,6 +72,7 @@ for p in reversed(paths):
 from src.config import settings
 from src.database import BaseORM
 from src.models.hotels import HotelsOrm
+from src.models.rooms import RoomsOrm
 
 config.set_main_option("sqlalchemy.url", f"{settings.DB_URL}?async_fallback=True")
 

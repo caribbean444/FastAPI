@@ -1,11 +1,14 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String
+from sqlalchemy import String, ForeignKey
 
 from src.database import BaseORM
 
-class HotelsOrm(BaseORM):
-    __tablename__ = "hotels"
+class RoomsOrm(BaseORM):
+    __tablename__ = "rooms"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(length=100))
-    locations: Mapped[str]
+    hotel_id: Mapped[int] = mapped_column(ForeignKey("hotels.id"))
+    title: Mapped[int]
+    description: Mapped[str | None]
+    price: Mapped[int]
+    quantity: Mapped[int]
