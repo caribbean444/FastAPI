@@ -18,7 +18,6 @@ hotels = [
 ]
 
 
-
 @router.get("")
 async def get_hotels(
     pagination: PaginationDep,
@@ -32,9 +31,9 @@ async def get_hotels(
         if title and hotel["title"] != title:
             continue
         hotels_.append(hotel)
-    if pagination.page > 0 and pagination.per_page > 0 : # type: ignore
-        start = (pagination.page - 1) * pagination.per_page # type: ignore
-        end = start + pagination.per_page # type: ignore
+    if pagination.page > 0 and pagination.per_page > 0:  # type: ignore
+        start = (pagination.page - 1) * pagination.per_page  # type: ignore
+        end = start + pagination.per_page  # type: ignore
         return hotels_[start:end]
     else:
         return {"status": "Invalid page or per_page"}
@@ -50,28 +49,31 @@ async def delete_hotel(hotel_id: int):
 
 @router.post("")
 async def create_hotel(
-        # title: str = Body(embed=True),
-        # name: str = Body(embed=True),
-        hotel_data: Hotel = Body(openapi_examples=
-        {
+    # title: str = Body(embed=True),
+    # name: str = Body(embed=True),
+    hotel_data: Hotel = Body(
+        openapi_examples={
             "1": {"summary": "Cox", "value": {"title": "Cox", "name": "cox"}},
-            "2": {"summary": "Marriott", "value": {"title": "Marriott", "name": "marriott"}},
-        })
+            "2": {
+                "summary": "Marriott",
+                "value": {"title": "Marriott", "name": "marriott"},
+            },
+        }
+    )
 ):
     global hotels
-    hotels.append({
-        "id": hotels[-1]["id"] + 1,
-        "title": hotel_data.title,
-        "name": hotel_data.name,
-    })
+    hotels.append(
+        {
+            "id": hotels[-1]["id"] + 1,
+            "title": hotel_data.title,
+            "name": hotel_data.name,
+        }
+    )
     return {"status": "OK"}
 
 
 @router.put("/{hotel_id}")
-async def put_hotel(
-    hotel_id: int,
-    hotel_data: Hotel
-):
+async def put_hotel(hotel_id: int, hotel_data: Hotel):
     if hotel_data.title == "" or hotel_data.name == "":
         return {"status": "Input data error"}
     global hotels
@@ -82,11 +84,12 @@ async def put_hotel(
     return {"status": "OK"}
 
 
-@router.patch("/{hotel_id}", summary="Update hotel partially", description="<h1>Update hotel partially</h1>")
-async def patch_hotel(
-    hotel_id: int,
-    hotel_data: HotelPatch
-):
+@router.patch(
+    "/{hotel_id}",
+    summary="Update hotel partially",
+    description="<h1>Update hotel partially</h1>",
+)
+async def patch_hotel(hotel_id: int, hotel_data: HotelPatch):
     if hotel_data.title == "" and hotel_data.name == "":
         return {"status": "Input data error"}
     for hotel in hotels:
