@@ -10,6 +10,8 @@ from src.database import async_session_maker, engine
 
 from src.models.hotels import HotelsOrm
 
+from repositories.hotels import HotelsRepository
+
 
 router = APIRouter(prefix="/hotels")
 
@@ -23,21 +25,12 @@ async def get_hotels(
     per_page = pagination.per_page or 5
     async with async_session_maker() as session:
 
-        query = select(HotelsOrm)
-        if title:
-            query = query.filter(
-                func.lower(HotelsOrm.title).contains(title.strip().lower())
-            )
-        if location:
-            query = query.filter(
-                func.lower(HotelsOrm.locations).contains(location.strip().lower())
-            )
-        query = query.limit(per_page).offset(per_page * (pagination.page - 1))  # type: ignore
-
-        print(query.compile(engine, compile_kwargs={"literal_binds": True}))
-        result = await session.execute(query)
-        hotels = result.scalars().all()
-        return hotels
+        return await HotelsRepository(session).get_all(
+            location=location,
+            title=title,
+            limit=per_page,
+            offset=per_page * (pagination.page - 1),  # type: ignore
+        )
 
 
 @router.delete("/{hotel_id}")
