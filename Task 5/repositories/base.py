@@ -6,6 +6,8 @@ from src.database import BaseORM
 
 from src.database import engine
 
+from pydantic import BaseModel
+
 
 class BaseRepository:
     model: Type[BaseORM] | None = None
@@ -24,9 +26,10 @@ class BaseRepository:
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def add(self, *args, **kwargs):
-        add_hotel_stmt = insert(self.model).values(**kwargs)  # type: ignore
+    async def add(self, data: BaseModel):
+        add_data_stmt = insert(self.model).values(**data.model_dump()).returning(self.model)  # type: ignore
         print(
-            add_hotel_stmt.compile(engine, compile_kwargs={"literal_binds": True})
+            add_data_stmt.compile(engine, compile_kwargs={"literal_binds": True})
         )  # * Вывод сырого SQL запроса
-        return await self.session.execute(add_hotel_stmt)
+        result = await self.session.execute(add_data_stmt)
+        return result.scalars().one()
